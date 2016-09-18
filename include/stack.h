@@ -1,4 +1,5 @@
 #include <iostream>
+#include "stack.h"
 using namespace std;
 
 template <typename T>
