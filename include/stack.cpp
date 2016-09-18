@@ -19,13 +19,7 @@ inline stack<T>::stack() :count_(0),array_size_(0),array_(nullptr){};
 
 template <typename T>//вставка элемента в стэк 
 inline auto stack<T>::push(T const &val)->void {
-	if (array_ == nullptr) {
-		array_ = new T[1];
-		array_[0] = val;
-		count_++; array_size_++;
-	}
-	else {
-		if (count_ == array_size_) {
+	if (count_ == array_size_) {
 			array_size_ *= 2;
 			T *tmp = mem_copy(count_,array_size_,array_);
 			delete[] array_;
@@ -36,7 +30,7 @@ inline auto stack<T>::push(T const &val)->void {
 		count_++;
 	
 	}
-}
+
 
 template <typename T>//конструктор копирования
 inline stack<T>::stack(const stack&tmp) :count_(tmp.count_), array_size_(tmp.array_size_), array_(copy(tmp.count_, tmp.array_size, tmp.array_)) {}
