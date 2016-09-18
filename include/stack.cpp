@@ -1,4 +1,5 @@
-template <typename T>//копирование и выделение памяти 
+#include "stack.h"
+ <typename T>//копирование и выделение памяти 
 auto stack<T>::mem_copy(size_t count_m, size_t array_size_m, const T * tmp)->T* {
 	T *mass = new T[array_size_m];
 	copy(tmp,tmp+count_m,mass);
