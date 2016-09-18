@@ -15,3 +15,12 @@ SCENARIO("push", "[push]"){
   REQUIRE(s.count()==1);
   REQUIRE(s.pop()==0);
 }
+
+SCENARIO("top", "[top]"){
+  stack<int> s;
+  s.push(1);
+  s.push(2);
+  s.push(3);
+  REQUIRE(s.pop()==2);
+  REQUIRE(s.top()==3);
+}
