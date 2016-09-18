@@ -1,4 +1,12 @@
 #include "stack.h"
+template <typename T>//копирование и выделение памяти 
+inline auto stack<T>::mem_copy(size_t count_m, size_t array_size_m, const T * tmp)->T* {
+	T *mass = new T[array_size_m];
+	copy(tmp,tmp+count_m,mass);
+	return mass;
+}
+
+
 template <typename T>//освобождение памяти
 inline stack<T>::~stack()
 {
@@ -17,11 +25,10 @@ inline auto stack<T>::push(T const &val)->void {
 	}
 	else {
 		if (count_ == array_size_) {
-			T *tmp = array_;
 			array_size_ *= 2;
-			array_ = new T[array_size_];
-			std::copy(tmp,tmp+count_,array_);
-			delete[] tmp;
+			T *tmp = mem_copy(count_,array_size_,array_);
+			delete[] array_;
+			array_ = tmp;
 
 		}
 		array_[count_] = val;
@@ -31,10 +38,7 @@ inline auto stack<T>::push(T const &val)->void {
 }
 
 template <typename T>//конструктор копирования
-inline stack<T>::stack(const stack&tmp):count_(tmp.count_),array_size_(tmp.array_size_),array_(new T[tmp.array_size_]) {
-	array_ = new T[array_size_];
-	copy(tmp.array_, tmp.array_ + count_, array_);
-}
+inline stack<T>::stack(const stack&tmp) :count_(tmp.count_), array_size(tmp.array_size_), array_(copy(tmp.count_, tmp.array_size, tmp.array_)) {};
 
 template <typename T>//перегрузка оператора присваивания 
 inline auto stack<T>::operator=(const stack&tmp)->stack& {
