@@ -31,7 +31,7 @@ inline auto stack<T>::push(T const &val)->void {
 }
 
 template <typename T>//конструктор копирования
-inline stack<T>::stack(const stack&tmp):count_(tmp.count_),array_size(tmp.array_size_),array_(new T[tmp.array_size_]) {
+inline stack<T>::stack(const stack&tmp):count_(tmp.count_),array_size_(tmp.array_size_),array_(new T[tmp.array_size_]) {
 	array_ = new T[array_size_];
 	copy(tmp.array_, tmp.array_ + count_, array_);
 }
