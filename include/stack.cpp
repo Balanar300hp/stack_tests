@@ -53,11 +53,6 @@ inline auto stack<T>::operator=(const stack&tmp)->stack& {
 	return *this;
 }
 
-template <typename T>// вывод стэка
-inline auto stack<T>::print()->void {
-	for (size_t i(0); i < count_; i++) cout << array_[i] << endl; 
-}
-
 template <typename T>//возвращаем count_
 inline auto stack<T>::count() const noexcept->size_t {
 	return count_;
