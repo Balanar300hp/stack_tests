@@ -11,7 +11,7 @@ template <typename T>//освобождение памяти
 inline stack<T>::~stack()
 {
 	delete[] array_;
-}
+} 
 
 template <typename T>//конструктор по умолчанию
 inline stack<T>::stack() :count_(0),array_size_(0),array_(nullptr){};
