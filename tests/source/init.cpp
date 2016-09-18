@@ -24,3 +24,10 @@ SCENARIO("top", "[top]"){
   REQUIRE(s.pop()==2);
   REQUIRE(s.top()==3);
 }
+SCENARIO("operprisv", "[operprisv]"){
+  stack<int> s1;
+  s1.push(1);
+  stack<int> s2;
+  s2=s;
+  REQUIRE(s1.count()==s2.count());
+}
