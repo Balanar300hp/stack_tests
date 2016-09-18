@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-set(TESTS_FOR_PROJECT Matrix)
+set(TESTS_FOR_PROJECT Stack)
 
 project(Tests)
 
