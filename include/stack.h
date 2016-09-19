@@ -5,14 +5,14 @@ template <typename T>
 class stack
 {
 public:
-	stack();
-	stack(const stack&);
-	auto count() const noexcept->size_t;
-	auto push(T const &)->void;
-	auto pop()->T;
-	auto top() const->T&;
-	~stack();
-	auto operator=(const stack&tmp)->stack&;
+	stack();/*noexcept*/
+	stack(const stack&); /*strong*/
+	auto count() const noexcept->size_t;/*noexcept*/
+	auto push(T const &)->void;/*strong*/
+	auto pop()->T;/*strong*/
+	auto top() const->T&;/*strong*/
+	~stack(); 	/*noexcept*/
+	auto operator=(const stack&tmp)->stack&;/*strong*/
 private:
 	T * array_;
 	size_t array_size_;
