@@ -20,10 +20,11 @@ inline stack<T>::stack() :count_(0),array_size_(0),array_(nullptr){};
 template <typename T>//вставка элемента в стэк 
 inline auto stack<T>::push(T const &val)->void {
 	if (count_ == array_size_) {
-			array_size_ *= 2;
-			T *tmp = mem_copy(count_,array_size_,array_);
+			size_t size = array_size_ * 2+ (array_size_==0);
+			T *tmp = mem_copy(count_,size_,array_);
 			delete[] array_;
 			array_ = tmp;
+			array_size_=size;
 
 		}
 		array_[count_] = val;
@@ -41,8 +42,7 @@ inline auto stack<T>::operator=(const stack&tmp)->stack& {
 		delete[] array_;
 		count_ = tmp.count_;
 		array_size_ = tmp.array_size_;
-		array_ = new T[array_size_];
-		copy(tmp.array_, tmp.array_ + count_, array_);
+		array_ =mem_copy(tmp.count_, tmp.array_size_, tmp.array_);
 	}
 	return *this;
 }
