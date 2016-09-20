@@ -48,8 +48,8 @@ SCENARIO("empty", "[empty]"){
 SCENARIO("empty2", "[empty2]"){
   stack<int> s1;
   s1.push(1);
-  s1.pop();
   s1.top();
+  s1.pop();
   REQUIRE(s1.empty()==true);
 }
 
