@@ -13,7 +13,7 @@ public:
 	auto top() const->T&;/*strong*/
 	~stack(); 	/*noexcept*/
 	auto operator=(const stack&tmp)->stack&;/*strong*/
-	auto empty()->bool;
+	auto empty()->bool;	/*noexcept*/
 private:
 	T * array_;
 	size_t array_size_;
