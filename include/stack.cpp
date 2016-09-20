@@ -7,6 +7,11 @@ auto mem_copy(size_t count_m, size_t array_size_m, const T * tmp)->T* {
 	return mass; 
 }
 
+template<typename T>//пуст ли стэк или нет
+inline auto stack<T>::empty()->bool { 
+	if (this->count()) { return false; }
+	else { return true; }
+}
 
 template <typename T>//освобождение памяти
 inline stack<T>::~stack()
