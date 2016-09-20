@@ -42,5 +42,5 @@ SCENARIO("const", "[constr]"){
 SCENARIO("empty", "[empty]"){
   stack<int> s1;
   s1.push(1);
-  REQUIRE(s1.empty());
+  REQUIRE(s1.empty()==false);
 }
