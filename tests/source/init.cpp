@@ -39,7 +39,7 @@ SCENARIO("const", "[constr]"){
   REQUIRE(s1.count()==s2.count());
 }
 
-SCENARIO("const", "[constr]"){
+SCENARIO("empty", "[empty]"){
   stack<int> s1;
   s1.push(1);
   REQUIRE(s1.empty());
