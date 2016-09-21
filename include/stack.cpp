@@ -64,7 +64,7 @@ inline auto stack<T>::pop()->T {
 }
 
 template <typename T>//удаление элемента
-inline auto stack<T>::top() const->T& {
+inline auto stack<T>::top() const->T&  {
 	if (count_ == 0) throw logic_error("Empty!");
 	return array_[count_];
 
