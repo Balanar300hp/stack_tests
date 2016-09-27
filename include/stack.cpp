@@ -32,8 +32,9 @@ inline auto stack<T>::push(T const &val)->void {
 			array_size_=size;
 
 		}
-		count_++;
-		array_[count_-1] = val;
+		
+		array_[count_] = val;
+	++count_;
 		
 	
 	}
