@@ -13,8 +13,7 @@ public:
 	auto top() const->T&;/*strong*/
 	~stack(); 	/*noexcept*/
 	auto operator=(const stack&tmp)->stack&;/*strong*/
-	auto print()->void;
-	auto empty()->bool;
+	auto empty()->bool;/*noexcept*/
 };
 
 
@@ -54,10 +53,6 @@ inline auto stack<T>::push(T const &val)->void {
 
 		allocator<T>::ptr_[allocator<T>::count_] = val;
 		++allocator<T>::count_;
-		
-		std::cout << "ZDES PUSH & count_=" <<count_<< std::endl;
-		
-	
 	}
 
 
