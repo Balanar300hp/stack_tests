@@ -34,7 +34,9 @@ auto mem_copy(size_t count_m, size_t array_size_m, const T * tmp)->T* {
 
 
 template <typename T>//освобождение памяти
-inline stack<T>::~stack() {};
+inline stack<T>::~stack() {
+delete[] allocator<T>::ptr_;
+};
 
 template <typename T>//конструктор по умолчанию
 inline stack<T>::stack() : allocator<T>() {};
