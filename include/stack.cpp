@@ -1,6 +1,4 @@
 #include "stack.h"
-
-
 template <typename T>
 class stack : protected allocator<T>
 {
