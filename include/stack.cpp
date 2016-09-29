@@ -43,7 +43,6 @@ throw;
 
 template <typename T>//освобождение памяти
 inline stack<T>::~stack() {
-delete[] allocator<T>::ptr_;
 };
 
 template <typename T>//конструктор по умолчанию
