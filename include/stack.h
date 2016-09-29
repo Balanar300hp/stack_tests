@@ -21,7 +21,10 @@ inline allocator<T>::allocator(size_t size) : ptr_(static_cast<T *>(size == 0 ? 
 };
 
 template <typename T>//деструктор аллокатора
-inline allocator<T>::~allocator(){};
+inline allocator<T>::~allocator(){
+
+delete static_cast<void*>(ptr_);
+};
 
 template <typename T>//swap allocator
 inline auto allocator<T>::swap(allocator& other)->void {
