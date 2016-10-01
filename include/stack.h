@@ -16,5 +16,6 @@ public:
 	T * ptr_;
 	size_t size_;
 	size_t count_;
+	auto swap(stack & tmp) -> void; /*noexcept*/
 
 };
