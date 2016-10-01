@@ -12,4 +12,9 @@ public:
 	~stack(); 	/*noexcept*/
 	auto operator=(const stack&tmp)->stack&;/*strong*/
 	auto empty()->bool;/*noexcept*/
+	private : 
+	T * ptr_;
+	size_t size_;
+	size_t count_;
+
 };
