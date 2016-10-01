@@ -62,15 +62,18 @@ inline stack<T>::stack(stack const &tmp) {
 
 template <typename T>//перегрузка оператора присваивания 
 inline auto stack<T>::operator=(const stack &tmp)->stack& {
-	if (this != &tmp) {
-		delete[] ptr_; 
-		ptr_ = mem_copy(tmp.count_, tmp.size_, tmp.ptr_);
-		count_ = tmp.count_;
-		size_ = tmp.size_;
-		
+	if (this != &rhs) {
+		(stack(tmp)).swap(*this);
 	}
 	return *this;
 }
+template<typename T>
+auto stack<T>::swap(stack & tmp) -> void {
+	std::swap(tmp.size_, size_);
+	std::swap(tmp.ptr_, ptr_);
+	std::swap(tmp.count_, count_);
+}
+
 template <typename T>//возвращаем count_
 inline auto stack<T>::count() const noexcept->size_t {
 	return count_;
