@@ -54,8 +54,9 @@ inline auto stack<T>::push(T const &val)->void {
 
 template <typename T>//конструктор копирования
 inline stack<T>::stack(stack const &tmp) {
-	count_ = tmp.count_;
 	ptr_ = mem_copy(tmp.count_, tmp.size_, tmp.ptr_);
+	count_ = tmp.count_;
+	
 	size_ = tmp.size_;
 };
 
@@ -63,10 +64,10 @@ template <typename T>//перегрузка оператора присваив�
 inline auto stack<T>::operator=(const stack &tmp)->stack& {
 	if (this != &tmp) {
 		delete[] ptr_; 
-		count_ = tmp.count_;
-		std::cout << tmp.count_<<"sad";
-		size_ = tmp.size_;
 		ptr_ = mem_copy(tmp.count_, tmp.size_, tmp.ptr_);
+		count_ = tmp.count_;
+		size_ = tmp.size_;
+		
 	}
 	return *this;
 }
