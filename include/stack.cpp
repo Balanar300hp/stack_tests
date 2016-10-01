@@ -30,7 +30,7 @@ inline stack<T>::~stack() {
 };
 
 template <typename T>//конструктор по умолчанию
-inline stack<T>::stack() :count_(0),size_(0),array_(nullptr){};
+inline stack<T>::stack() :count_(0),size_(0),ptr_(nullptr){};
 
 
 
