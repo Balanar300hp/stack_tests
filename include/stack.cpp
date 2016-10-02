@@ -62,7 +62,7 @@ inline stack<T>::stack(stack const &tmp) {
 
 template <typename T>//перегрузка оператора присваивания 
 inline auto stack<T>::operator=(const stack &tmp)->stack& {
-	if (this != &rhs) {
+	if (this != &tmp) {
 		(stack(tmp)).swap(*this);
 	}
 	return *this;
