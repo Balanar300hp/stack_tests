@@ -19,6 +19,7 @@ protected:
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
 
+
 template <typename T1, typename T2>
 auto construct(T1 * ptr, T2 const & value)->void {
 	new(ptr) T1(value);
@@ -37,7 +38,6 @@ void destroy(FwdIter first, FwdIter last) noexcept
 		destroy(&*first);
 	}
 }
-
 
 template <typename T>// êîíñòðóêòîð àëëîêàòîðà
 allocator<T>::allocator(size_t size) : ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))), size_(0), count_(size) {
@@ -93,13 +93,11 @@ auto mem_copy(size_t count_m, size_t array_size_m, const T * tmp)->T* {
 
 
 template <typename T>//îñâîáîæäåíèå ïàìÿòè
-stack<T>::~stack() {
-destroy(allocator<T>::ptr_);
-};
+stack<T>::~stack() {};
 
 template <typename T>//êîíñòðóêòîð ïî óìîë÷àíèþ
 stack<T>::stack()  {
-
+destroy(allocator<T>::ptr_);
 };
 
 
