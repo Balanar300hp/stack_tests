@@ -92,13 +92,12 @@ auto mem_copy(size_t count_m, size_t array_size_m, const T * tmp)->T* {
 }
 
 
-template <typename T>//îñâîáîæäåíèå ïàìÿòè
-stack<T>::~stack() {};
+template <typename T>
+stack<T>::~stack() {
+destroy(allocator<T>::ptr_, allocator<T>::ptr_ + allocator<T>::count_);};
 
-template <typename T>//êîíñòðóêòîð ïî óìîë÷àíèþ
-stack<T>::stack()  {
-destroy(allocator<T>::ptr_);
-};
+template <typename T>
+stack<T>::stack()  {};
 
 
 
