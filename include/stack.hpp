@@ -19,6 +19,25 @@ protected:
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
 
+template <typename T1, typename T2>
+auto construct(T1 * ptr, T2 const & value)->void {
+	new(ptr) T1(value);
+}
+
+template <typename T>
+void destroy(T * ptr) noexcept
+{
+	ptr->~T();
+}
+
+template <typename FwdIter>
+void destroy(FwdIter first, FwdIter last) noexcept
+{
+	for (; first != last; ++first) {
+		destroy(&*first);
+	}
+}
+
 
 template <typename T>// êîíñòðóêòîð àëëîêàòîðà
 allocator<T>::allocator(size_t size) : ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))), size_(0), count_(size) {
@@ -74,7 +93,9 @@ auto mem_copy(size_t count_m, size_t array_size_m, const T * tmp)->T* {
 
 
 template <typename T>//îñâîáîæäåíèå ïàìÿòè
-stack<T>::~stack() {};
+stack<T>::~stack() {
+destroy(allocator<T>::ptr_);
+};
 
 template <typename T>//êîíñòðóêòîð ïî óìîë÷àíèþ
 stack<T>::stack()  {
@@ -92,7 +113,7 @@ auto stack<T>::push(T const &val)->void {
 		allocator<T>::ptr_ = tmp;
 		allocator<T>::size_ = size;
 	}
-	
+	construct(allocator<T>::ptr_+allocator<T>::count_,val);
 	++allocator<T>::count_;
 }
 
@@ -125,7 +146,7 @@ auto stack<T>::count() const noexcept->size_t {
 template <typename T>// óìåíüøåíèå count_ 
 auto stack<T>::pop()->void {
 	if (allocator<T>::count_ == 0) throw std::logic_error("Empty!");
-	
+	destroy(allocator<T>::ptr_+allocator<T>::count_);
 	--allocator<T>::count_;
 }
 
