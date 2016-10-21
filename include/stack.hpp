@@ -3,7 +3,7 @@
 
 
 template<typename T>
-class allocator
+class allocator 
 {
 protected:
 	allocator(size_t size = 0);
@@ -40,7 +40,7 @@ void destroy(FwdIter first, FwdIter last) noexcept
 }
 
 template <typename T>// êîíñòðóêòîð àëëîêàòîðà
-allocator<T>::allocator(size_t size) : ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))), size_(0), count_(size) {
+allocator<T>::allocator(size_t size) : ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))), size_(size), count_(0) {
 };
 
 template <typename T>//äåñòðóêòîð àëëîêàòîðà
@@ -62,7 +62,7 @@ template <typename T>
 class stack : private allocator<T>
 {
 public:
-	stack();/*noexcept*/
+	stack(size_t size=0);/*noexcept*/ 
 	stack(stack const &); /*strong*/
 	auto count() const noexcept->size_t;/*noexcept*/
 	auto push(T const &)->void;/*strong*/
@@ -102,29 +102,27 @@ stack<T>::~stack() {
 destroy(allocator<T>::ptr_, allocator<T>::ptr_ + allocator<T>::count_);};
 
 template <typename T>
-stack<T>::stack()  {};
+stack<T>::stack(size_t size): allocator<T>(size) {};
 
 
 
 template <typename T>//âñòàâêà ýëåìåíòà â ñòýê 
 auto stack<T>::push(T const &val)->void {
-	if (allocator<T>::count_ == allocator<T>::size_) {//óâåëè÷èâàåò ïàìÿòü 
-		size_t size = allocator<T>::size_ * 2 + (allocator<T>::size_ == 0);
-		T *tmp = mem_copy(allocator<T>::count_, size, allocator<T>::ptr_);
-		delete[] allocator<T>::ptr_;
-		allocator<T>::ptr_ = tmp;
-		allocator<T>::size_ = size;
+	if (allocator<T>::count_ == allocator<T>::size_) {
+		size_t array_size = allocator<T>::size_ * 2 + (allocator<T>::size_ == 0);
+		stack<T> temp(array_size);
+		while (temp.count() < allocator<T>::count_) temp.push(allocator<T>::ptr_[temp.count()]); 
+		this->swap(temp);
 	}
-	construct(allocator<T>::ptr_+allocator<T>::count_,val);
+	construct(allocator<T>::ptr_ + allocator<T>::count_, val);
 	++allocator<T>::count_;
 }
 
 
 template <typename T>//êîíñòðóêòîð êîïèðîâàíèÿ
-stack<T>::stack(stack const &tmp) {
-	allocator<T>::count_ = tmp.count_;
+stack<T>::stack(stack const &tmp): allocator<T>(tmp.size_){
 	allocator<T>::ptr_ = mem_copy(tmp.count_, tmp.size_, tmp.ptr_);
-	allocator<T>::size_ = tmp.size_;
+	allocator<T>::count_ = tmp.count_;
 };
 
 template <typename T>//ïåðåãðóçêà îïåðàòîðà ïðèñâàèâàíèÿ 
