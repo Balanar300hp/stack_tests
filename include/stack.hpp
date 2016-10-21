@@ -3,7 +3,7 @@
 
 
 template<typename T>
-class allocator
+class allocator 
 {
 protected:
 	allocator(size_t size = 0);
