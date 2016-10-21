@@ -87,7 +87,12 @@ auto stack<T>::empty()->bool {
 template <typename T>//êîïèðîâàíèå è âûäåëåíèå ïàìÿòè 
 auto mem_copy(size_t count_m, size_t array_size_m, const T * tmp)->T* {
 	T *mass = new T[array_size_m];
-	std::copy(tmp, tmp + count_m, mass);
+	try {
+	std::copy(tmp, tmp + count_m, mass);}
+	catch (...){
+	delete[] mass;
+		throw;
+	}
 	return mass;
 }
 
