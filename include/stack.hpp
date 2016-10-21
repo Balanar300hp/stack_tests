@@ -97,7 +97,7 @@ stack<T>::~stack() {
 destroy(allocator<T>::ptr_, allocator<T>::ptr_ + allocator<T>::count_);};
 
 template <typename T>
-stack<T>::stack(size_t size) allocator<T>(size) {};
+stack<T>::stack(size_t size): allocator<T>(size) {};
 
 
 
@@ -115,7 +115,7 @@ auto stack<T>::push(T const &val)->void {
 
 
 template <typename T>//êîíñòðóêòîð êîïèðîâàíèÿ
-stack<T>::stack(stack const &tmp) allocator<T>(tmp.size_){
+stack<T>::stack(stack const &tmp): allocator<T>(tmp.size_){
 	allocator<T>::ptr_ = mem_copy(tmp.count_, tmp.size_, tmp.ptr_);
 	allocator<T>::count_ = tmp.count_;
 };
