@@ -70,7 +70,7 @@ public:
 	auto top() const->const T&;/*strong*/
 	~stack(); 	/*noexcept*/
 	auto operator=(const stack&tmp)->stack&;/*strong*/
-	auto empty() noexcept const->bool;/*noexcept*/
+	auto empty() const noexcept->bool;/*noexcept*/
 
 };
 
