@@ -80,7 +80,7 @@ public:
 
 
 template<typename T> 
-auto stack<T>::empty() noexcept const->bool {
+auto stack<T>::empty() const noexcept->bool {
 	return (allocator<T>::count_ == 0);
 }
 
