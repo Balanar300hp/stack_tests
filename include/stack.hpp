@@ -2,7 +2,7 @@
 #include <new>  
 #include <stdexcept>
 #include <vector>
-    
+     
 template<typename T> //копирование памяти
 auto mem_copy(const T * tmp, size_t L, size_t R) -> T * {
 	T * arr = new T[R];
