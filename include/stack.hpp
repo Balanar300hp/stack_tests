@@ -100,7 +100,7 @@ public:
 		allocator(std::size_t size = 0) /*strong*/;
 	allocator(allocator const & other) /*strong*/;
 	auto operator =(allocator const & other)->allocator & = delete;
-	~allocator();
+	~allocator();/*noexcept*/
 
 	auto resize() /*strong*/ -> void;
 
@@ -171,17 +171,9 @@ auto allocator<T>::construct(T * ptr, T const & value)->void {
 template <typename T>//удаление всего ptr_
 auto allocator<T>::destroy(T * ptr)->void
 {
-	
-	if (ptr < ptr_ || ptr >= ptr_ + size_) {
-		throw std::out_of_range("Error");
-	}
-
 
 	ptr->~T();
-	map_->reset(ptr - ptr_);
-	
-	
-	
+	map_->reset(ptr - ptr_);	
 }
 
 
@@ -241,9 +233,9 @@ class stack
 {
 public:
 	explicit
-		stack(size_t size = 0);
+		stack(size_t size = 0);/*strong*/
 	auto operator =(stack const & other) /*strong*/ -> stack &;
-
+	stack (stack const & other) =default;/*strong*/
 	auto empty() const /*noexcept*/ -> bool;
 	auto count() const /*noexcept*/ -> size_t;
 
