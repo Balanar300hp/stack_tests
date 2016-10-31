@@ -135,20 +135,17 @@ allocator<T>::allocator(size_t size): ptr_(static_cast<T *>(size == 0 ? nullptr 
 };
 
 template<typename T>//конструктор копирования 
-allocator<T>::allocator(allocator const & tmp) :
-	ptr_(static_cast<T *>(tmp.size_ == 0 ? nullptr : operator new(tmp.size_ * sizeof(T)))),size_(tmp.size_),map_(std::make_unique<bitset>(tmp.size_)) {
-	
+allocator<T>::allocator(allocator const & tmp) :allocator<T>(tmp.size_){
 	for (size_t i = 0; i < size_; ++i) {
 		construct(ptr_ + i, tmp.ptr_[i]);
-		
 	}
 }
 
 template <typename T>//деструктор
 allocator<T>::~allocator() {
-	/*if (map_->counter() > 0) {
+	if (map_->counter() > 0) {
 		destroy(ptr_, ptr_ + map_->counter());
-	}*/
+	}
 	operator delete(ptr_);
 };
 
@@ -201,7 +198,8 @@ auto allocator<T>::resize()-> void {
 	size_t size = size_ * 2 + (size_ == 0);
 	allocator<T> buff(size);
 	for (size_t i = 0; i < size_; ++i) {
-		buff.construct(buff.ptr_ + i, ptr_[i]);
+	if (map_.test(i))
+{		buff.construct(buff.ptr_ + i, ptr_[i]);}
 	}
 	this->swap(buff);
 	size_ = size;
@@ -277,7 +275,7 @@ stack<T>::stack(size_t size) : allocate(size) {};
 
 template <typename T>
 auto stack<T>::push(T const &val)->void {
-	if (allocate.empty() == true || allocate.full() == true) {
+	if (allocate.full()) {
 		allocate.resize();
 	}
 	allocate.construct(allocate.get() + allocate.count(), val);
@@ -288,8 +286,7 @@ auto stack<T>::push(T const &val)->void {
 template <typename T>
 auto stack<T>::operator=(const stack &tmp)->stack&  {
 	if (this != &tmp) {
-		for (size_t i = 0; i < tmp.count(); i++) 
-			this->push(*(tmp.allocate.get() + i));
+		stack(tmp).allocate.swap(allocate);
 	}
 	return *this;
 }
