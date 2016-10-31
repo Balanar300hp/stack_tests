@@ -2,71 +2,55 @@
 #include <new>  
 #include <stdexcept>
 #include <vector>
-     
-template<typename T> //копирование памяти
-auto mem_copy(const T * tmp, size_t L, size_t R) -> T * {
-	T * arr = new T[R];
-	try {
-		std::copy(tmp, tmp + L, arr);
-	}
-	catch (...) {
-		delete[] arr;
-		throw;
-	}
-	return arr;
-}
+#include <memory>
 
-  
-class BitSet {
+
+class bitset
+{
 public:
-	BitSet(size_t size = 0);
-	auto reset() noexcept -> void;
-	auto reset(size_t tmp)-> void;
-	auto set() noexcept -> void;
-	auto set(size_t tmp)-> void;
-	auto test(size_t tmp) const-> int;
-	auto resize() noexcept -> void;
-	auto size() const noexcept->size_t;
-private: 
-	std::vector<int> bitset;
+	explicit
+		bitset(size_t size) /*strong*/;
 
+	bitset(bitset const & other) = delete;
+	auto operator =(bitset const & other)->bitset & = delete;
+	bitset(bitset && other) = delete;
+	auto operator =(bitset && other)->bitset & = delete;
+
+
+	auto set(size_t index) /*strong*/ -> void;
+	auto reset(size_t index) /*strong*/ -> void;
+	auto test(size_t index) /*strong*/ -> bool;
+	auto counter() /*noexcept*/ -> size_t;
+	auto size() /*noexcept*/ -> size_t;
+
+private:
+	std::unique_ptr<bool[]>  ptr_;
+	size_t size_;
+	size_t counter_;
 };
-auto BitSet::size() const noexcept -> size_t {//получаем размер битсета
-	return bitset.capacity();
+
+auto bitset::size()-> size_t {
+	return size_;
+}
+auto bitset::counter()-> size_t {
+	return counter_;
 }
 
-BitSet::BitSet(size_t size): bitset(size) {//инициализируем битсет
-	this->reset();
-}
-
-
-auto BitSet::reset() noexcept->void {//сбрасываем значения битсета
-	for (auto i : bitset) {
-		i = 0;
-	}
-}
-
-
-auto BitSet::reset(size_t tmp)->void {//сбрасываем конкретное значение
-	if (tmp < bitset.size()) {
-		bitset.at(tmp) = 0;
-	}
-	else {
-		throw std::out_of_range("Error");
-	}
+bitset::bitset(size_t size) :
+	ptr_(std::make_unique<bool[]>(size)),
+	size_(size),counter_(0) {
+	
 }
 
 
-auto BitSet::set() noexcept->void {//устанавливаем все 1 
-	for (auto i : bitset) {
-		i = 1;
-	}
-}
 
-
-auto BitSet::set(size_t tmp)->void {//устанавливаем 1 в нужном месте
-	if (tmp < bitset.size()) {
-		bitset.at(tmp) = 1;
+auto bitset::reset(size_t index)->void {
+	
+	if (index <= size()) {
+		if (test(index) != false) {
+			ptr_[index] = false;
+			--counter_;
+		}
 	}
 	else {
 		throw std::out_of_range("Error");
@@ -74,54 +58,69 @@ auto BitSet::set(size_t tmp)->void {//устанавливаем 1 в нужно
 }
 
 
-auto BitSet::test(size_t tmp) const->int {//проверка битсета
-	if (tmp < bitset.size()) {
-		return bitset.at(tmp);
+
+auto bitset::set(size_t index)->void {
+	
+	
+	if (index <= size()) {
+		if (test(index) != true) {
+			
+			ptr_[index] = true;
+			++counter_;
+			std::cout << counter_ << " counter" << std::endl;
+		}
+	}
+	else {
+		throw std::out_of_range("Error");
+	}
+
+
+}
+
+
+auto bitset::test(size_t index) ->bool{
+	if (index <= size()) {
+		return ptr_[index];
 	}
 	else {
 		throw std::out_of_range("Error");
 	}
 }
 
-auto BitSet::resize() noexcept -> void {//увеличение вектора знач-я битсета
-	bitset.resize(bitset.size() * 2 + (bitset.size() == 0));
-}
+
 
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
 
-template<typename T>
+template <typename T>
 class allocator
 {
 public:
 	explicit
-	allocator(size_t size = 0);
-	allocator(allocator const & tmp);
+		allocator(std::size_t size = 0) /*strong*/;
+	allocator(allocator const & other) /*strong*/;
+	auto operator =(allocator const & other)->allocator & = delete;
 	~allocator();
-	auto resize() ->void;
-	auto construct(T * ptr, T const& value) ->void;
-	auto destroy(T * ptr)->void;
-	
-	auto swap(allocator& other)->void;
-	auto operator=(allocator const&)->allocator& = delete;
 
-	auto get() noexcept->T *;
-	auto get() const noexcept->T const *;
-	auto count() const noexcept->size_t;
-	auto full() const noexcept->bool;
-	auto empty() const noexcept->bool;
+	auto resize() /*strong*/ -> void;
 
-	template <typename FwdIter>
-	auto destroy(FwdIter first, FwdIter last)->void;
-	
-	
+	auto construct(T * ptr, T const & value) /*strong*/ -> void;
+	auto destroy(T * ptr) /*noexcept*/ -> void;
+
+	auto get() /*noexcept*/ -> T *;
+	auto get() const /*noexcept*/ -> T const *;
+
+	auto count() const /*noexcept*/ -> size_t;
+	auto full() const /*noexcept*/ -> bool;
+	auto empty() const /*noexcept*/ -> bool;
+	auto swap(allocator & other) /*noexcept*/ -> void;
 private:
-	T * ptr_;
+	auto destroy(T * first, T * last) /*noexcept*/ -> void;
+	
+
 	size_t size_;
-	size_t count_;
-	BitSet bs;
-
-
+	T * ptr_;
+	std::unique_ptr<bitset> map_;
 };
 
 //__________________________________________________________________________________________________________________
@@ -131,24 +130,25 @@ private:
 
 
 template <typename T>//конструктор с параметром 
-allocator<T>::allocator(size_t size): ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))), size_(size), count_(0),bs(0) {};
+allocator<T>::allocator(size_t size): ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))), size_(size), map_(std::make_unique<bitset>(size)){
+
+};
 
 template<typename T>//конструктор копирования 
 allocator<T>::allocator(allocator const & tmp) :
-	ptr_(static_cast<T *>(tmp.size_ == 0 ? nullptr : operator new(tmp.size_ * sizeof(T)))),size_(tmp.size_),count_(0),bs(tmp.bs) {
+	ptr_(static_cast<T *>(tmp.size_ == 0 ? nullptr : operator new(tmp.size_ * sizeof(T)))),size_(tmp.size_),map_(std::make_unique<bitset>(tmp.size_)) {
 	
-	for (size_t i = 0; i < tmp.count_; ++i) {
-		if (bs.test(i)) {
-			(*this).construct((*this).ptr_ + i, tmp.ptr_[i]);
-		}
+	for (size_t i = 0; i < size_; ++i) {
+		construct(ptr_ + i, tmp.ptr_[i]);
+		
 	}
 }
 
 template <typename T>//деструктор
 allocator<T>::~allocator() {
-	if (count_ > 0) {
-		destroy(ptr_, ptr_ + count_);
-	}
+	/*if (map_->counter() > 0) {
+		destroy(ptr_, ptr_ + map_->counter());
+	}*/
 	operator delete(ptr_);
 };
 
@@ -156,19 +156,16 @@ template <typename T>//реализация свап
 auto allocator<T>::swap(allocator & other)->void {
 	std::swap(ptr_, other.ptr_);
 	std::swap(size_, other.size_);
-	std::swap(count_, other.count_);
-	std::swap(bs, other.bs);
+	std::swap(map_, other.map_);
 };
 
 template <typename T>//инициализация
 auto allocator<T>::construct(T * ptr, T const & value)->void {
-	if (ptr < ptr_ || ptr > ptr_ + size_) {
+	if (ptr < ptr_ || ptr >= ptr_ + size_) {
 		throw std::out_of_range("Error");
 	}
 	new(ptr) T(value);
-	std::cout << count_ << std::endl;
-	bs.set(count_);
-	++count_;
+	map_->set(ptr - ptr_);
 	
 	
 	
@@ -177,21 +174,22 @@ auto allocator<T>::construct(T * ptr, T const & value)->void {
 template <typename T>//удаление всего ptr_
 auto allocator<T>::destroy(T * ptr)->void
 {
-	if (ptr < ptr_ || ptr > ptr_ + size_) {
+	
+	if (ptr < ptr_ || ptr >= ptr_ + size_) {
 		throw std::out_of_range("Error");
 	}
-	ptr->~T();
 
-	--count_;
-	bs.reset(count_);
+
+	ptr->~T();
+	map_->reset(ptr - ptr_);
+	
 	
 	
 }
 
 
 template <typename T>//удаление диапазона
-template<typename FwdIter>
-auto allocator<T>::destroy(FwdIter first, FwdIter last)->void
+auto allocator<T>::destroy(T * first, T * last)->void
 {
 	for (; first != last; ++first) {
 		destroy(&*first);
@@ -201,79 +199,83 @@ auto allocator<T>::destroy(FwdIter first, FwdIter last)->void
 template<typename T>//увеличиваем память
 auto allocator<T>::resize()-> void {
 	size_t size = size_ * 2 + (size_ == 0);
-	T * newArray = mem_copy(ptr_, count_, size);
-	delete[] ptr_;
-	ptr_ = newArray;
+	allocator<T> buff(size);
+	for (size_t i = 0; i < size_; ++i) {
+		buff.construct(buff.ptr_ + i, ptr_[i]);
+	}
+	this->swap(buff);
 	size_ = size;
-	bs.resize();
 }
 
 template<typename T>//проверка на пустоту
-auto allocator<T>::empty() const noexcept-> bool {
-	return (count_ == 0);
+auto allocator<T>::empty() const -> bool {
+	return (map_->counter() == 0);
 }
 
 template<typename T>//проверка на заполненность
-auto allocator<T>::full() const noexcept-> bool {
-	return (count_ == size_);
+auto allocator<T>::full() const -> bool {
+	return (map_->counter() == size_);
 }
 
 template<typename T>//получить ptr_
-auto allocator<T>::get() noexcept-> T * {
+auto allocator<T>::get() -> T * {
 	return ptr_;
 }
 
 template<typename T>//получить ptr_ const метод
-auto allocator<T>::get() const noexcept-> T const * {
+auto allocator<T>::get() const -> T const * {
 	return ptr_;
 }
 
 template<typename T>//вернуть count_
-auto allocator<T>::count() const noexcept-> size_t {
-	return count_;
+auto allocator<T>::count() const -> size_t {
+	return map_->counter();
 }
+
+
+
 
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
 
 template <typename T>
-class stack 
+class stack
 {
 public:
-	explicit stack(size_t size = 0);/*noexcept*/
-	stack(stack const &); /*strong*/
-	auto count() const noexcept->size_t;/*noexcept*/
-	auto push(T const &)->void;/*strong*/
-	auto pop()->void;/*strong*/
-	auto top() const->const T&;/*strong*/
-	~stack(); 	/*noexcept*/
-	auto operator=(const stack &tmp)->stack&;/*strong*/
-	auto empty() const noexcept->bool;/*noexcept*/
+	explicit
+		stack(size_t size = 0);
+	auto operator =(stack const & other) /*strong*/ -> stack &;
+
+	auto empty() const /*noexcept*/ -> bool;
+	auto count() const /*noexcept*/ -> size_t;
+
+	auto push(T const & value) /*strong*/ -> void;
+	auto pop() /*strong*/ -> void;
+	auto top() /*strong*/ -> T &;
+	auto top() const /*strong*/ -> T const &;
+
 private:
 	allocator<T> allocate;
+
+	//auto throw_is_empty() const -> void;
 };
-
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
 
 
 
-template<typename T>//проверка на пустоту
-auto stack<T>::empty() const noexcept->bool {
+template<typename T>
+auto stack<T>::empty() const->bool {
 	return (allocate.count() == 0);
 }
 
-template <typename T>//деструктор стэка
-stack<T>::~stack() {
-	allocate.destroy(allocate.get(), allocate.get() + allocate.count());
-};
 
-template <typename T>//конструктор с параметром
+template <typename T>
 stack<T>::stack(size_t size) : allocate(size) {};
 
 
 
-template <typename T>//добавление элементов в стэк
+template <typename T>
 auto stack<T>::push(T const &val)->void {
 	if (allocate.empty() == true || allocate.full() == true) {
 		allocate.resize();
@@ -282,33 +284,38 @@ auto stack<T>::push(T const &val)->void {
 }
 
 
-template <typename T>//конструктор копирования
-stack<T>::stack(stack const &tmp):allocate(tmp.allocate) {};
 
-template <typename T>//оператор присваивания
+template <typename T>
 auto stack<T>::operator=(const stack &tmp)->stack&  {
 	if (this != &tmp) {
-		
-		(allocator<T>(tmp.allocate)).swap((*this).allocate);
+		for (size_t i = 0; i < tmp.count(); i++) 
+			this->push(*(tmp.allocate.get() + i));
 	}
 	return *this;
 }
 
 
-template <typename T>//вернуть count_
-auto stack<T>::count() const noexcept->size_t {
+template <typename T>
+auto stack<T>::count() const->size_t {
 	return allocate.count();
 }
 
-template <typename T>//удаление элемента
+template <typename T>
 auto stack<T>::pop()->void {
 	if (allocate.count() == 0) throw std::logic_error("Empty!");
-	allocate.destroy(allocate.get() + allocate.count());
+	allocate.destroy(allocate.get() + (this->count()-1));
 }
 
-template <typename T>//возвращаем верхний элемент стэка
+template <typename T>
 auto stack<T>::top() const->const T&{
 	if (allocate.count() == 0) throw std::logic_error("Empty!");
-return allocate.get()[allocate.count() - 1];
+return(*(allocate.get() + this->count() - 1));
 
 }
+
+template <typename T>
+auto stack<T>::top()->T&{
+	if (allocate.count() == 0) throw std::logic_error("Empty!");
+return(*(allocate.get() + this->count() - 1));
+}
+
