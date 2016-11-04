@@ -4,13 +4,14 @@ public:
     shared_ptr();
     shared_ptr(T* ptr);
     shared_ptr(shared_ptr const & other);
+    shared_ptr(shared_ptr && other);
     auto operator= (shared_ptr const & other)->shared_ptr &;
+    auto operator =(shared_ptr && other) -> shared_ptr &;
+    auto operator ->() const -> T *;
+    auto operator *() const -> T *
     ~shared_ptr();
     auto count() const->size_t;
-    auto operator ->() const -> T *;
-     auto operator *() const -> T *
-    shared_ptr(shared_ptr && other);
-     auto operator =(shared_ptr && other) -> shared_ptr &
+ 
 private:
     T* ptr_;
     size_t count;
@@ -91,7 +92,9 @@ auto shared_ptr<T>:count() const->size_t{
     {
         return ptr_;
     }
-    template<typename T>
+    
+
+   template<typename T>
     auto shared_ptr<T>::operator *() const -> T *
     {
         return *(ptr_);
