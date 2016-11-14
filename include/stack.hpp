@@ -8,7 +8,7 @@
 #include <cstdio>
  
   
-  
+  //WORK POS
 using namespace std;
 
 class B {
