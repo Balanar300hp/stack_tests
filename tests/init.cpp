@@ -22,7 +22,7 @@ SCENARIO("operprisv", "[operprisv]"){
   s1.push(1);
   stack<int> s2;
   s2=s1;
-  REQUIRE(s1.count()==s2.count());
+  REQUIRE(s2.count()==1);
 }
 
 
