@@ -199,7 +199,7 @@ public:
 	explicit
 		stack(size_t size = 0);/*strong*/
 	auto operator =(stack const & other) /*strong*/ -> stack &;
-	stack(stack const & other);/*strong*/
+	stack(stack const & other)=default;/*strong*/
 	auto empty() const /*noexcept*/ -> bool;
 	auto count() const /*noexcept*/ -> size_t;
 	auto push(T const & value) /*strong*/ -> void;
@@ -224,11 +224,11 @@ auto stack<T>::empty() const->bool {
 	return (allocate.count() == 0);
 }
 
-template <typename T>
-stack<T>::stack(stack const & other) {
-	std::lock_guard<std::mutex> lock_(other.mutex_);
-	allocate = other.allocate;
-}
+/*template <typename T>
+stack<T>::stack(stack const & tmp) {
+	std::lock_guard<std::mutex> lock_(tmp.mutex_);
+	
+}*/
 
 template <typename T>
 auto stack<T>::push(T const &val)->void {
@@ -243,7 +243,7 @@ auto stack<T>::push(T const &val)->void {
 
 template <typename T>
 auto stack<T>::operator=(const stack &tmp)->stack& {
-	std::lock_guard<std::mutex> lock_(mutex_);
+	std::lock_guard<std::mutex> lock_(tmp.mutex_);
 	if (this != &tmp) {
 		(allocator<T>(tmp.allocate)).swap(allocate);
 	}
