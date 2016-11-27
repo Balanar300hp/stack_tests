@@ -1,8 +1,8 @@
 #include <iostream>
-#include <new>  
 #include <stdexcept>
-#include <vector>
 #include <memory>
+#include <thread>
+#include <mutex>
 
 
 
@@ -12,84 +12,42 @@ class bitset
 public:
 	explicit
 		bitset(size_t size) /*strong*/;
-
 	bitset(bitset const & other) = delete;
 	auto operator =(bitset const & other)->bitset & = delete;
 	bitset(bitset && other) = delete;
 	auto operator =(bitset && other)->bitset & = delete;
-
-
 	auto set(size_t index) /*strong*/ -> void;
 	auto reset(size_t index) /*strong*/ -> void;
 	auto test(size_t index) /*strong*/ -> bool;
 	auto counter() /*noexcept*/ -> size_t;
 	auto size() /*noexcept*/ -> size_t;
-
 private:
 	std::unique_ptr<bool[]>  ptr_;
 	size_t size_;
 	size_t counter_;
 };
-
 auto bitset::size()-> size_t {
 	return size_;
 }
 auto bitset::counter()-> size_t {
 	return counter_;
 }
-
 bitset::bitset(size_t size) :
 	ptr_(std::make_unique<bool[]>(size)),
-	size_(size),counter_(0) {
-	
+	size_(size), counter_(0) {
 }
-
-
-
 auto bitset::reset(size_t index)->void {
-	
-	if (index <= size()) {
-		if (test(index) != false) {
-			ptr_[index] = false;
-			--counter_;
-		}
-	}
-	else {
-		throw std::out_of_range("Error");
-	}
+	if (index >= 0 && index < size_) { ptr_[index] = false; --counter_; }
+	else throw std::logic_error("Bad Value");
 }
-
-
-
 auto bitset::set(size_t index)->void {
-	
-	
-	if (index <= size()) {
-		if (test(index) != true) {
-			
-			ptr_[index] = true;
-			++counter_;
-			std::cout << counter_ << " counter" << std::endl;
-		}
-	}
-	else {
-		throw std::out_of_range("Error");
-	}
-
-
+	if (index >= 0 && index < size_) { ptr_[index] = true; ++counter_; }
+	else throw std::logic_error("Bad Value");
 }
-
-
-auto bitset::test(size_t index) ->bool{
-	if (index <= size()) {
-		return ptr_[index];
-	}
-	else {
-		throw std::out_of_range("Error");
-	}
+auto bitset::test(size_t index) ->bool {
+	if (index >= 0 && index < size_) return !ptr_[index];
+	else throw std::logic_error("Bad Value");
 }
-
-
 
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
@@ -118,7 +76,6 @@ public:
 	auto swap(allocator & other) /*noexcept*/ -> void;
 private:
 	auto destroy(T * first, T * last) /*noexcept*/ -> void;
-	
 
 	size_t size_;
 	T * ptr_;
@@ -132,12 +89,12 @@ private:
 
 
 template <typename T>//конструктор с параметром 
-allocator<T>::allocator(size_t size): ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))), size_(size), map_(std::make_unique<bitset>(size)){
+allocator<T>::allocator(size_t size) : ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))), size_(size), map_(std::make_unique<bitset>(size)) {
 
 };
 
 template<typename T>//конструктор копирования 
-allocator<T>::allocator(allocator const & tmp) :allocator<T>(tmp.size_){
+allocator<T>::allocator(allocator const & tmp) :allocator<T>(tmp.size_) {
 	for (size_t i = 0; i < size_; ++i) {
 		construct(ptr_ + i, tmp.ptr_[i]);
 	}
@@ -145,8 +102,8 @@ allocator<T>::allocator(allocator const & tmp) :allocator<T>(tmp.size_){
 
 template <typename T>//деструктор
 allocator<T>::~allocator() {
-	if (map_->counter() > 0) {
-		destroy(ptr_, ptr_ + map_->counter());
+	if (this->count() > 0) {
+		destroy(ptr_, ptr_ + size_);
 	}
 	operator delete(ptr_);
 };
@@ -160,43 +117,50 @@ auto allocator<T>::swap(allocator & other)->void {
 
 template <typename T>//инициализация
 auto allocator<T>::construct(T * ptr, T const & value)->void {
-	if (ptr < ptr_ || ptr >= ptr_ + size_) {
+	if (ptr < ptr_ && ptr >= ptr_ + size_) {
 		throw std::out_of_range("Error");
 	}
 	new(ptr) T(value);
 	map_->set(ptr - ptr_);
-	
-	
-	
+
+
+
 }
 
-template <typename T>//удаление всего ptr_
+template <typename T>
 auto allocator<T>::destroy(T * ptr)->void
 {
-
-	ptr->~T();
-	map_->reset(ptr - ptr_);	
+	if (!map_->test(ptr - ptr_) && ptr >= ptr_&&ptr <= ptr_ + this->count())
+	{
+		ptr->~T();
+		map_->reset(ptr - ptr_);
+	}else {
+		throw std::out_of_range("Error");
+	}
 }
 
 
-template <typename T>//удаление диапазона
+template <typename T>
 auto allocator<T>::destroy(T * first, T * last)->void
 {
-	for (; first != last; ++first) {
-		destroy(&*first);
+	if (first >= ptr_&&last <= ptr_ + this->count()) {
+		for (; first != last; ++first) destroy(&*first);
+		
+	}else {
+		throw std::out_of_range("Error");
 	}
 }
 
 template<typename T>//увеличиваем память
 auto allocator<T>::resize()-> void {
-	size_t size = size_ * 2 + (size_ == 0);
-	allocator<T> buff(size);
+	allocator<T> buff(size_ * 2 + (size_ == 0));
 	for (size_t i = 0; i < size_; ++i) {
-	if (map_->test(i))
-{		buff.construct(buff.ptr_ + i, ptr_[i]);}
+		if (buff.map_->test(i))
+		{
+			buff.construct(buff.get() + i, ptr_[i]);
+		}
 	}
 	this->swap(buff);
-	size_ = size;
 }
 
 template<typename T>//проверка на пустоту
@@ -237,10 +201,9 @@ public:
 	explicit
 		stack(size_t size = 0);/*strong*/
 	auto operator =(stack const & other) /*strong*/ -> stack &;
-	stack (stack const & other) =default;/*strong*/
+	//stack(stack const & other) = default;/*strong*/
 	auto empty() const /*noexcept*/ -> bool;
 	auto count() const /*noexcept*/ -> size_t;
-
 	auto push(T const & value) /*strong*/ -> void;
 	auto pop() /*strong*/ -> void;
 	auto top() /*strong*/ -> T &;
@@ -248,13 +211,14 @@ public:
 
 private:
 	allocator<T> allocate;
-
-	//auto throw_is_empty() const -> void;
+	std::mutex mutex_;
 };
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
 
 
+template <typename T>
+stack<T>::stack(size_t size) : allocate(size) {};
 
 template<typename T>
 auto stack<T>::empty() const->bool {
@@ -263,24 +227,20 @@ auto stack<T>::empty() const->bool {
 
 
 template <typename T>
-stack<T>::stack(size_t size) : allocate(size) {};
-
-
-
-template <typename T>
 auto stack<T>::push(T const &val)->void {
+	std::lock_guard<std::mutex> lock_(mutex_);
 	if (allocate.full()) {
 		allocate.resize();
 	}
-	allocate.construct(allocate.get() + allocate.count(), val);
+	allocate.construct(allocate.get() + this->count(), val);
 }
 
 
 
 template <typename T>
-auto stack<T>::operator=(const stack &tmp)->stack&  {
+auto stack<T>::operator=(const stack &tmp)->stack& {
 	if (this != &tmp) {
-		stack(tmp).allocate.swap(allocate);
+		(allocator<T>(tmp.allocate)).swap(allocate);
 	}
 	return *this;
 }
@@ -293,19 +253,22 @@ auto stack<T>::count() const->size_t {
 
 template <typename T>
 auto stack<T>::pop()->void {
-	if (allocate.count() == 0) throw std::logic_error("Empty!");
-	allocate.destroy(allocate.get() + (this->count()-1));
+	std::lock_guard<std::mutex> lock_(mutex_);
+	if (this->count() == 0) throw std::logic_error("Empty!");
+	allocate.destroy(allocate.get() + (this->count() - 1));
 }
 
 template <typename T>
 auto stack<T>::top() const->const T&{
-	if (allocate.count() == 0) throw std::logic_error("Empty!");
+	std::lock_guard<std::mutex> lock_(mutex_);
+	if (this->count() == 0) throw std::logic_error("Empty!");
 return(*(allocate.get() + this->count() - 1));
 
 }
 
 template <typename T>
-auto stack<T>::top()->T&{
-	if (allocate.count() == 0) throw std::logic_error("Empty!");
-return(*(allocate.get() + this->count() - 1));
+auto stack<T>::top()->T& {
+	std::lock_guard<std::mutex> lock_(mutex_);
+	if (this->count() == 0) throw std::logic_error("Empty!");
+	return(*(allocate.get() + this->count() - 1));
 }
