@@ -62,3 +62,18 @@ SCENARIO("empty3", "[empty3]"){
   
   REQUIRE(s1.empty()==false);
 }
+
+SCENARIO("mutex", "[mutex]"){
+  stack<int> s1;
+  s1.push(1);
+  s1.push(2);
+  
+  stack<int> s2;
+ s2=s1;
+s2.pop();
+ s2.top();
+  REQUIRE(s1.top()==2);
+ REQUIRE(s2.top()==1);
+ 
+}
+
