@@ -3,7 +3,7 @@
 #include <memory>
 #include <thread>
 #include <mutex>
-
+#include <atomic>
 class bitset
 {
 public:
@@ -242,7 +242,7 @@ auto stack<T>::operator=(const stack &tmp)->stack& {
 		std::lock(mutex_, tmp.mutex_);
 	std::lock_guard<std::mutex> self_lock(mutex_, std::adopt_lock);
 	std::lock_guard<std::mutex> other_lock(tmp.mutex_, std::adopt_lock);
-		(allocator<T>(tmp.allocate)).swap(this->allocate);
+		atomic_store(&(allocator<T>(tmp.allocate)),this->allocate);
 	}
 	return *this;
 }
