@@ -4,9 +4,6 @@
 #include <thread>
 #include <mutex>
 
-
-
-
 class bitset
 {
 public:
@@ -198,8 +195,7 @@ template <typename T>
 class stack
 {
 public:
-	explicit
-		stack(size_t size = 0);/*strong*/
+	explicit stack(size_t size = 0);/*strong*/
 	auto operator =(stack const & other) /*strong*/ -> stack &;
 	stack(stack const & other);/*strong*/
 	auto empty() const /*noexcept*/ -> bool;
