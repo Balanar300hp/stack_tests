@@ -197,7 +197,7 @@ class stack
 public:
 	explicit stack(size_t size = 0);/*strong*/
 	auto operator =(stack const & other) /*strong*/ -> stack &;
-	stack(stack const & other);/*strong*/
+		stack(stack const & other) :stack(other, std::lock_guard<std::mutex>(other.mutex_)) {};/*strong*/
 	auto empty() const /*noexcept*/ -> bool;
 	auto count() const /*noexcept*/ -> size_t;
 	auto push(T const & value) /*strong*/ -> void;
@@ -207,6 +207,7 @@ public:
 	auto operator==(stack const & rhs) -> bool; /*noexcept*/
 
 private:
+	stack(const stack &tmp, const std::lock_guard<std::mutex> &) : allocate(allocator<T>(tmp.allocate)) {}
 	allocator<T> allocate;
 	mutable std::mutex mutex_;
 };
@@ -214,14 +215,7 @@ private:
 //__________________________________________________________________________________________________________________
 
 template <typename T>
-stack<T>::stack(stack const & tmp) {
-	std::lock_guard<std::mutex> lock(tmp.mutex_);
-	allocator<T> alloc = tmp.allocate;
-	allocate.swap(alloc);
-}
-
-template <typename T>
-stack<T>::stack(size_t size) : allocate(size),mutex_(){};
+stack<T>::stack(size_t size) : allocate(size){};
 
 template<typename T>
 auto stack<T>::empty() const->bool {
