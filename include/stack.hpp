@@ -217,10 +217,9 @@ private:
 //__________________________________________________________________________________________________________________
 
 template <typename T>
-stack<T>::stack(stack const & other) {
-	std::lock_guard<std::mutex> lock_(other.mutex_);
-	for (size_t i = 0; i < tmp.count_; i++) construct(allocator<T>::ptr_ + i, tmp.ptr_[i]);
-	allocator<T>::count_ = tmp.count_;
+stack<T>::stack(stack const & tmp) {
+	std::lock_guard<std::mutex> lock_(tmp.mutex_);
+	allocate(tmp.allocate);
 }
 
 template <typename T>
