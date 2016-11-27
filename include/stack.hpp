@@ -4,6 +4,9 @@
 #include <thread>
 #include <mutex>
 
+
+
+
 class bitset
 {
 public:
@@ -162,7 +165,6 @@ auto allocator<T>::resize()-> void {
 
 template<typename T>//проверка на пустоту
 auto allocator<T>::empty() const -> bool {
-
 	return (map_->counter() == 0);
 }
 
@@ -196,8 +198,10 @@ template <typename T>
 class stack
 {
 public:
-	explicit stack(size_t size = 0);/*strong*/
+	explicit
+		stack(size_t size = 0);/*strong*/
 	auto operator =(stack const & other) /*strong*/ -> stack &;
+	stack(stack const & other);/*strong*/
 	auto empty() const /*noexcept*/ -> bool;
 	auto count() const /*noexcept*/ -> size_t;
 	auto push(T const & value) /*strong*/ -> void;
@@ -207,17 +211,24 @@ public:
 
 private:
 	allocator<T> allocate;
-	std::mutex mutex_;
+	mutable std::mutex mutex_;
 };
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
 
+template <typename T>
+stack<T>::stack(stack const & other) {
+	std::lock_guard<std::mutex> lock_(other.mutex_);
+	for (size_t i = 0; i < tmp.count_; i++) construct(allocator<T>::ptr_ + i, tmp.ptr_[i]);
+	allocator<T>::count_ = tmp.count_;
+}
 
 template <typename T>
 stack<T>::stack(size_t size) : allocate(size) {};
 
 template<typename T>
 auto stack<T>::empty() const->bool {
+	std::lock_guard<std::mutex> lock_(mutex_);
 	return (allocate.count() == 0);
 }
 
@@ -235,6 +246,9 @@ auto stack<T>::push(T const &val)->void {
 
 template <typename T>
 auto stack<T>::operator=(const stack &tmp)->stack& {
+	std::lock(mutex_, tmp.mutex_);
+	std::lock_guard<std::mutex> self_lock(mutex_, std::adopt_lock);
+	std::lock_guard<std::mutex> other_lock(tmp.mutex_, std::adopt_lock);
 	if (this != &tmp) {
 		(allocator<T>(tmp.allocate)).swap(allocate);
 	}
