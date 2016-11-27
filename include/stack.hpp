@@ -209,7 +209,7 @@ public:
 
 private:
 	allocator<T> allocate;
-	mutable std::mutex mutex_;
+	std::mutex mutex_;
 };
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
@@ -220,7 +220,6 @@ stack<T>::stack(size_t size) : allocate(size) {};
 
 template<typename T>
 auto stack<T>::empty() const->bool {
-	std::lock_guard<std::mutex> lock_(mutex_);
 	return (allocate.count() == 0);
 }
 
