@@ -68,11 +68,11 @@ SCENARIO("mutex", "[mutex]"){
   s1.push(1);
   s1.push(2);
   
-  thread potok_1(&stack<int>::push, &s1, 2);
+  thread potok_1(&stack<int>::push, &s1, 3);
   potok_1.join();
-  REQUIRE(s.top()==2);
-  thread potok_2(&stack<int>::pop, &1);
+  REQUIRE(s.top()==3);
+  thread potok_2(&stack<int>::pop, &s1);
   potok_2.join();
-  REQUIRE(s.top()==1);
+  REQUIRE(s.top()==2);
 }
 
