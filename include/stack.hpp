@@ -162,6 +162,7 @@ auto allocator<T>::resize()-> void {
 
 template<typename T>//проверка на пустоту
 auto allocator<T>::empty() const -> bool {
+
 	return (map_->counter() == 0);
 }
 
@@ -219,6 +220,7 @@ stack<T>::stack(size_t size) : allocate(size) {};
 
 template<typename T>
 auto stack<T>::empty() const->bool {
+	std::lock_guard<std::mutex> lock_(mutex_);
 	return (allocate.count() == 0);
 }
 
@@ -236,6 +238,7 @@ auto stack<T>::push(T const &val)->void {
 
 template <typename T>
 auto stack<T>::operator=(const stack &tmp)->stack& {
+	std::lock_guard<std::mutex> lock_(mutex_);
 	if (this != &tmp) {
 		(allocator<T>(tmp.allocate)).swap(allocate);
 	}
