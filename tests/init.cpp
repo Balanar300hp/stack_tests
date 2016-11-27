@@ -17,13 +17,13 @@ SCENARIO("top", "[top]"){
   s.pop();
   REQUIRE(s.top()==2);
 }
-/*SCENARIO("operprisv", "[operprisv]"){
+SCENARIO("operprisv", "[operprisv]"){
   stack<int> s1;
   s1.push(1);
   stack<int> s2;
   s2=s1;
   REQUIRE(s2==s1);
-}*/
+}
 
 
 SCENARIO("empty", "[empty]"){
