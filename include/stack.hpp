@@ -1,6 +1,4 @@
-ifndef stack_cpp 
-#define stack_cpp
-#pragma once
+
 #include <iostream>
 #include <memory>
 #include <thread>
@@ -241,4 +239,4 @@ auto stack<T>::top()const->T const & {
 
 template<typename T>
 auto stack<T>::throw_is_empty()const->void{ throw("empty"); }
-#endif
+
