@@ -242,7 +242,8 @@ auto stack<T>::operator=(const stack &tmp)->stack& {
 		std::lock(mutex_, tmp.mutex_);
 	std::lock_guard<std::mutex> self_lock(mutex_, std::adopt_lock);
 	std::lock_guard<std::mutex> other_lock(tmp.mutex_, std::adopt_lock);
-		atomic_store(&(allocator<T>(tmp.allocate)),this->allocate);
+		allocator<T> al(tmp.allocate);
+		std::atomic_store(&al,this->allocate);
 	}
 	return *this;
 }
