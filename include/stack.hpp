@@ -197,7 +197,7 @@ class stack
 public:
 	explicit stack(size_t size = 0);/*strong*/
 	auto operator =(stack const & other) /*strong*/ -> stack &;
-		stack(stack const & other) :stack(other, std::lock_guard<std::mutex>(other.mutex_)) {};/*strong*/
+		//stack(stack const & other) :stack(other, std::lock_guard<std::mutex>(other.mutex_)) {};/*strong*/
 	auto empty() const /*noexcept*/ -> bool;
 	auto count() const /*noexcept*/ -> size_t;
 	auto push(T const & value) /*strong*/ -> void;
@@ -207,7 +207,7 @@ public:
 	auto operator==(stack const & rhs) -> bool; /*noexcept*/
 
 private:
-	stack(const stack &tmp, const std::lock_guard<std::mutex> &) : allocate(allocator<T>(tmp.allocate)) {}
+	//stack(const stack &tmp, const std::lock_guard<std::mutex> &) : allocate(allocator<T>(tmp.allocate)) {}
 	allocator<T> allocate;
 	mutable std::mutex mutex_;
 };
@@ -239,9 +239,10 @@ template <typename T>
 auto stack<T>::operator=(const stack &tmp)->stack& {
 	
 	if (this != &tmp) {
-		std::lock(mutex_, tmp.mutex_);
-	std::lock_guard<std::mutex> self_lock(mutex_, std::adopt_lock);
-	std::lock_guard<std::mutex> other_lock(tmp.mutex_, std::adopt_lock);
+		std::lock_guard<std::mutex> lock(mutex_);
+		//std::lock(mutex_, tmp.mutex_);
+	//std::lock_guard<std::mutex> self_lock(mutex_, std::adopt_lock);
+	//std::lock_guard<std::mutex> other_lock(tmp.mutex_, std::adopt_lock);
 		allocator<T> al(tmp.allocate);
 		atomic_store(&al,this->allocate);
 	}
