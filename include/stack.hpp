@@ -208,6 +208,7 @@ public:
 	auto pop() /*strong*/ -> void;
 	auto top() /*strong*/ -> T &;
 	auto top() const /*strong*/ -> T const &;
+	auto operator==(stack const & rhs) -> bool; /*noexcept*/
 
 private:
 	allocator<T> allocate;
@@ -280,4 +281,19 @@ auto stack<T>::top()->T& {
 	std::lock_guard<std::mutex> lock_(mutex_);
 	if (this->count() == 0) throw std::logic_error("Empty!");
 	return(*(allocate.get() + this->count() - 1));
+}
+template<typename T> /*noexcept*/
+inline auto stack<T>::operator==(stack const & rhs) -> bool {
+	std::lock_guard<std::mutex> lock(mutex_);
+	if (rhs.allocate.count() != this->allocate.count()) {
+		return false;
+	}
+	else {
+		for (size_t i = 0; i < allocate.count(); i++) {
+			if (this->allocate.get()[i] != rhs.allocate.get()[i]) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
