@@ -198,7 +198,7 @@ public:
 	explicit
 		stack(size_t size = 0);/*strong*/
 	auto operator =(stack const & other) /*strong*/ -> stack &;
-	//stack(stack const & other) = default;/*strong*/
+	stack(stack const & other) = default;/*strong*/
 	auto empty() const /*noexcept*/ -> bool;
 	auto count() const /*noexcept*/ -> size_t;
 	auto push(T const & value) /*strong*/ -> void;
