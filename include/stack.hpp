@@ -297,7 +297,7 @@ auto stack<T>::operator=(const stack &tmp)->stack&  {
 
 template <typename T>
 auto stack<T>::count() const->size_t {
-	std::lock_guard<std::mutex> lock(mutex_);
+	//std::lock_guard<std::mutex> lock(mutex_);
 	return allocate.count();
 }
 
