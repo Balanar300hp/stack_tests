@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <vector>
 #include <memory>
+#include <mutex>
+#include <thread>
 
 
 class bitset
