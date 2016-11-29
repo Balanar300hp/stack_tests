@@ -255,10 +255,10 @@ private:
 //__________________________________________________________________________________________________________________
 
 template <typename T>		
- -stack<T>::stack(stack const & rhs) : allocate(0), mutex_() {		
- -	std::lock_guard<std::mutex> lock(rhs.mutex_);		
- -	allocator<T>(rhs.allocate).swap(allocate);		
- -}
+ stack<T>::stack(stack const & rhs) : allocate(0), mutex_() {		
+ 	std::lock_guard<std::mutex> lock(rhs.mutex_);		
+ 	allocator<T>(rhs.allocate).swap(allocate);		
+ }
 
 template<typename T>
 auto stack<T>::empty() const->bool {
