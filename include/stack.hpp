@@ -286,7 +286,7 @@ auto stack<T>::push(T const &val)->void {
 template <typename T>
 auto stack<T>::operator=(const stack &tmp)->stack&  {
 	if (this != &tmp) {
-		std::lock(mutex_, tmp.m_);		
+		std::lock(mutex_, tmp.mutex_);		
  		std::lock_guard<std::mutex> lock_a(mutex_, std::adopt_lock);		
  		std::lock_guard<std::mutex> lock_b(tmp.mutex_, std::adopt_lock);
 		stack(tmp).allocate.swap(allocate);
