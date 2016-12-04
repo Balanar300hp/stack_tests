@@ -249,15 +249,16 @@ public:
 private:
 	allocator<T> allocate;
 	mutable std::mutex mutex_;
-	//auto throw_is_empty() const -> void;
 };
 //__________________________________________________________________________________________________________________
 //__________________________________________________________________________________________________________________
 
 template <typename T>		
- stack<T>::stack(stack const & rhs) : allocate(0), mutex_() {		
- 	std::lock_guard<std::mutex> lock(rhs.mutex_);		
- 	allocator<T>(rhs.allocate).swap(allocate);		
+ stack<T>::stack(stack const & tmp) : allocate(0), mutex_() {		
+ 	std::lock(mutex_, tmp.mutex_);		
+ 		std::lock_guard<std::mutex> lock_a(mutex_, std::adopt_lock);		
+ 		std::lock_guard<std::mutex> lock_b(tmp.mutex_, std::adopt_lock);		
+ 	allocator<T>(tmp.allocate).swap(allocate);		
  }
 
 template<typename T>
@@ -297,7 +298,7 @@ auto stack<T>::operator=(const stack &tmp)->stack&  {
 
 template <typename T>
 auto stack<T>::count() const->size_t {
-	//std::lock_guard<std::mutex> lock(mutex_);
+	std::lock_guard<std::mutex> lock(mutex_);
 	return allocate.count();
 }
 
