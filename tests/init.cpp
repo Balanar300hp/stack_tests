@@ -40,7 +40,7 @@ SCENARIO("empty", "[empty]"){
 }
 
 
-CENARIO("threads", "[threads]"){
+SCENARIO("threads", "[threads]"){
   stack<int> s;
   s.push(1);
   s.push(2);
