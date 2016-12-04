@@ -220,7 +220,7 @@ auto stack<T>::pop()->std::shared_ptr<T>
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 			if(allocate.empty()) throw std::logic_error("Empty!"); 
-				std::shared_ptr<T> const res(std::make_shared<T>(std::move(allocate.ger()[allocate.count()-1])));//Make_shared than shared_ptr to directly construct high efficiency 
+				std::shared_ptr<T> const res(std::make_shared<T>(std::move(allocate.get()[allocate.count()-1])));//Make_shared than shared_ptr to directly construct high efficiency 
 			allocate.destroy(allocate.get() + allocate.count() - 1);
 			return res;
 }
