@@ -40,16 +40,23 @@ SCENARIO("empty", "[empty]"){
 }
 
 
-SCENARIO("mutex", "[mutex]"){
-  stack<int> s1;
-  s1.push(1);
-  s1.push(2);
-  
-  thread potok_1(&stack<int>::push, &s1, 3);
-  potok_1.join();
-  REQUIRE(s1.top()==3);
-  thread potok_2(&stack<int>::pop, &s1);
-  potok_2.join();
-  REQUIRE(s1.top()==2);
+CENARIO("threads", "[threads]"){
+  stack<int> s;
+  s.push(1);
+  s.push(2);
+  s.push(3);
+	std::thread t1([&s](){
+		for (int i = 0; i < 5; i++) {
+			s.push(i + 4);
+		}
+	});
+	std::thread t2([&s](){
+		for (int i = 0; i < 5; i++)
+		{
+			s.pop();
+		}
+	});
+	t1.join();
+	t2.join();
+  REQUIRE(s.count()==3);
 }
-
