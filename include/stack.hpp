@@ -176,9 +176,7 @@ stack<T>::stack(size_t size) : allocate(size), mutex_() {};
 template <typename T>
 stack<T>::stack(stack const & tmp) : allocate(0), mutex_() 
 {
-	std::lock(mutex_, tmp.mutex_);
-	std::lock_guard<std::mutex> lock1(mutex_, std::adopt_lock);
-	std::lock_guard<std::mutex> lock2(tmp.mutex_, std::adopt_lock);
+	std::lock_guard<std::mutex> lock(tmp.mutex_);
 	allocate.swap(allocator<T>(tmp.allocate));
 }
 
@@ -221,9 +219,9 @@ template <typename T>
 auto stack<T>::pop()->std::shared_ptr<T> 
 {
 	std::lock_guard<std::mutex> lock(mutex_);
-	if (allocate.count() == 0) throw std::logic_error("Empty!");
-	std::shared_ptr<T> top_(std::make_shared<T>(allocate.get()[allocate.count() - 1]));
-	allocate.destroy(allocate.get() + allocate.count() - 1);
-	return top_;
+			if(allocate.empty()) throw std::logic_error("Empty!"); 
+				std::shared_ptr<T> const res(std::make_shared<T>(std::move(allocate.ger()[allocate.count()-1])));//Make_shared than shared_ptr to directly construct high efficiency 
+			allocate.destroy(allocate.get() + allocate.count() - 1);
+			return res;
 }
 
