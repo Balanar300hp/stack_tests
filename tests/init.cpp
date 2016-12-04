@@ -11,38 +11,34 @@ SCENARIO("count", "[count]"){
   REQUIRE(s.count()==1);
 }
 
-SCENARIO("top", "[top]"){
+SCENARIO("push", "[push]"){
   stack<int> s;
   s.push(1);
-  s.push(2);
-  s.push(3);
-  s.pop();
-  REQUIRE(s.top()==2);
+  REQUIRE(s.count()==1);
 }
 
+SCENARIO("pop", "[pop]"){
+  stack<int> s;
+  s.push(1);
+  REQUIRE(*(s.pop())==1);	
+  REQUIRE(s.count()==0);
+}
+
+SCENARIO("prisv", "[prisv]"){
+  stack<int> s;
+  s.push(1);
+  stack<int> s2;
+  s2=s;
+  REQUIRE(s.count()==1);
+}
 
 SCENARIO("empty", "[empty]"){
-  stack<int> s1;
+  stack<int> s1, s2;
   s1.push(1);
-  REQUIRE(s1.empty()==false);
+  REQUIRE(!s1.empty());
+  REQUIRE(s2.empty());
 }
 
-SCENARIO("empty2", "[empty2]"){
-  stack<int> s1;
-  s1.push(1);
-  s1.pop();
-  REQUIRE(s1.empty()==true);
-}
-
-SCENARIO("empty3", "[empty3]"){
-  stack<int> s1;
-  s1.push(1);
-  s1.push(2);
-  s1.pop();
-  s1.top();
-  
-  REQUIRE(s1.empty()==false);
-}
 
 SCENARIO("mutex", "[mutex]"){
   stack<int> s1;
